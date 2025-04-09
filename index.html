@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B2C Tourism GM - Execution Strategy Dashboard</title>
+    <style>
+        /* Basic Reset & Font */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden; /* Contains background */
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #0077cc, #005fa3);
+            color: #ffffff;
+            padding: 30px 40px;
+            text-align: center;
+            border-bottom: 5px solid #ffc107; /* Accent color */
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        /* Navigation Tabs */
+        .pillar-nav {
+            display: flex;
+            justify-content: center;
+            background-color: #e9ecef;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab-button {
+            padding: 12px 25px;
+            margin: 0 5px;
+            cursor: pointer;
+            background-color: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 1em;
+            font-weight: 700;
+            color: #495057;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .tab-button:hover {
+            color: #005fa3;
+            border-bottom-color: #adb5bd;
+        }
+
+        .tab-button.active {
+            color: #0077cc;
+            border-bottom-color: #0077cc;
+            font-weight: 700;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 30px 40px;
+        }
+
+        .tab-content {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block; /* Shown when active */
+        }
+
+        .tab-content h2 {
+            font-size: 1.8em;
+            color: #005fa3;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ffc107;
+            display: inline-block;
+        }
+
+        /* Cards for Content */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            font-size: 1.2em;
+            color: #0077cc;
+            margin-bottom: 15px;
+            border-left: 4px solid #ffc107;
+            padding-left: 10px;
+        }
+
+        .card ul {
+            list-style: none;
+            padding-left: 5px;
+        }
+
+        .card ul li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .card ul li::before {
+            content: '✓'; /* Checkmark or other icon */
+            position: absolute;
+            left: 0;
+            color: #28a745; /* Success green */
+            font-weight: bold;
+        }
+
+        .card p {
+            font-size: 0.95em;
+            color: #555;
+        }
+
+        /* KPI Card Specifics */
+        .kpi-card h3 {
+            border-left-color: #dc3545; /* Different color for KPIs */
+        }
+        .kpi {
+            margin-bottom: 15px;
+        }
+        .kpi span {
+            display: block;
+            font-size: 0.9em;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .progress-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            width: 100%;
+        }
+        .progress-bar div {
+            height: 100%;
+            background-color: #0077cc;
+            border-radius: 5px;
+            width: 0; /* Start at 0, JS or dynamic style sets width */
+            transition: width 1.5s ease-out;
+            animation: progressBarAnim 1.5s ease-out forwards;
+        }
+        .progress-bar.warning div { background-color: #ffc107; }
+        .progress-bar.danger div { background-color: #dc3545; }
+        .progress-bar.success div { background-color: #28a745; }
+
+
+        /* Phasing Section Specifics */
+        .phase-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .phase-card {
+            flex: 1;
+            min-width: 250px; /* Minimum width before wrapping */
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            border-top: 5px solid; /* Color defined below */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+         .phase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .phase-card.launch { border-top-color: #ffc107; } /* Yellow */
+        .phase-card.scale { border-top-color: #0077cc; }  /* Blue */
+        .phase-card.optimize { border-top-color: #28a745; } /* Green */
+
+        .phase-card h3 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .phase-card .duration {
+            font-size: 0.9em;
+            color: #6c757d;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .phase-card p { /* Focus area */
+           font-size: 1em;
+           margin-bottom: 15px;
+           color: #555;
+           font-weight: bold;
+        }
+        .phase-card ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+        .phase-card ul li {
+             margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+            font-size: 0.9em;
+        }
+         .phase-card ul li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: #6c757d;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #343a40;
+            color: #f8f9fa;
+            text-align: center;
+            padding: 20px 40px;
+            margin-top: 30px; /* Add space above footer */
+            border-top: 3px solid #495057;
+        }
+
+        footer h4 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #ffc107; /* Accent color */
+        }
+
+        footer p {
+            font-size: 0.9em;
+            color: #ced4da;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes progressBarAnim {
+            from { width: 0; }
+            /* 'to' width is set dynamically via inline style */
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8em; }
+            header p { font-size: 1em; }
+            .pillar-nav { flex-wrap: wrap; justify-content: center; }
+            .tab-button { padding: 10px 15px; font-size: 0.9em; margin: 2px; }
+            .content-area { padding: 20px; }
+            .content-grid { grid-template-columns: 1fr; } /* Stack cards */
+            .phase-container { flex-direction: column; }
+            .phase-card { margin-bottom: 20px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <header>
+            <h1>GM Execution Strategy Dashboard</h1>
+            <p>New B2C Tourism Brand - Go-To-Market Framework & Competitive Advantage</p>
+        </header>
+
+        <nav class="pillar-nav">
+            <button class="tab-button active" data-tab="pillar1">1. Strategic Foundation</button>
+            <button class="tab-button" data-tab="pillar2">2. Digital Dominance</button>
+            <button class="tab-button" data-tab="pillar3">3. Customer Experience</button>
+            <button class="tab-button" data-tab="pillar4">4. Team & Culture</button>
+            <button class="tab-button" data-tab="pillar5">5. Ops & Scalability</button>
+            <button class="tab-button" data-tab="phasing">Phasing Plan</button>
+        </nav>
+
+        <main class="content-area">
+            <!-- Pillar 1: Strategic Foundation -->
+            <section id="pillar1" class="tab-content active">
+                <h2>Pillar 1: Strategic Foundation & Market Positioning</h2>
+                <div class="content-grid">
+                    <article class="card">
+                        <h3>Objective</h3>
+                        <p>Define a clear, defensible market position and build strategic alliances for accelerated growth.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Key Strategies</h3>
+                        <ul>
+                            <li>Define Niche & USP (e.g., Sustainable Luxury, Hyper-Personalized Family).</li>
+                            <li>Automate Competitive Analysis (Pricing, Offers, Marketing).</li>
+                            <li>Develop Data-Driven Partnership Ecosystem (Airlines, Hotels, Experiences).</li>
+                            <li>Utilize AI/Analytics for Market Trend Monitoring (Workcations, Sustainability).</li>
+                        </ul>
+                    </article>
+                    <article class="card">
+                        <h3>Leverage Focus</h3>
+                        <p>Partner networks (inventory, reach, credibility), Market data platforms.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Analytics Focus</h3>
+                        <p>TAM/SAM/SOM, Competitor Benchmarks, Partnership ROI, Trend Impact, Customer Segmentation.</p>
+                    </article>
+                     <article class="card">
+                        <h3>Technology Focus</h3>
+                        <p>Competitive Intel Tools (Similarweb, SEMrush), BI Platforms, Partnership Mgmt Software.</p>
+                    </article>
+                     <article class="card">
+                        <h3>Competitive Advantage</h3>
+                        <p>Well-defined niche, rapid credibility via tech-enabled partnerships, agile response to trends.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Industry Inspiration</h3>
+                        <p>Booking.com's conversion focus, Expedia's network breadth (applied to niche), Trend analysis leadership.</p>
+                    </article>
+                    <article class="card kpi-card">
+                        <h3>Key KPIs (Examples)</h3>
+                        <div class="kpi">
+                            <span>Niche Market Share Growth (Y1 Target: 5%)</span>
+                            <div class="progress-bar success"><div style="width: 20%;"></div></div>
+                        </div>
+                        <div class="kpi">
+                            <span>Strategic Partnership ROI (Target: >3:1)</span>
+                            <div class="progress-bar warning"><div style="width: 45%;"></div></div>
+                        </div>
+                         <div class="kpi">
+                            <span>Brand Awareness (Unaided Recall - Target: 10%)</span>
+                            <div class="progress-bar"><div style="width: 15%;"></div></div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Pillar 2: Digital Dominance -->
+            <section id="pillar2" class="tab-content">
+                <h2>Pillar 2: Digital Dominance & E-commerce Excellence</h2>
+                 <div class="content-grid">
+                     <article class="card">
+                        <h3>Objective</h3>
+                        <p>Build a high-traffic, high-converting digital presence and a seamless e-commerce experience.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Key Strategies</h3>
+                        <ul>
+                           <li>Data-Driven Multi-Channel Marketing (SEO, SEM, Content, Social).</li>
+                           <li>Relentless Conversion Rate Optimization (CRO) via A/B Testing.</li>
+                           <li>Implement AI-Driven Website Personalization Engine.</li>
+                           <li>Ensure Flawless Mobile-First E-commerce Platform (incl. PWA).</li>
+                           <li>Treat Digital Agency as Data-Driven Partner with Clear KPIs.</li>
+                        </ul>
+                    </article>
+                    <article class="card">
+                        <h3>Leverage Focus</h3>
+                        <p>Marketing automation, AI (optimization, personalization), partner marketing channels.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Analytics Focus</h3>
+                        <p>Traffic Sources, Conversion Rates, CAC, Channel ROI, Funnel Analysis, User Behaviour, A/B Test Results.</p>
+                    </article>
+                     <article class="card">
+                        <h3>Technology Focus</h3>
+                        <p>GA4, SEO Tools, Marketing Automation, CRM Integration, A/B Testing Platforms, Personalization Engines, DSPs.</p>
+                    </article>
+                     <article class="card">
+                        <h3>Competitive Advantage</h3>
+                        <p>Superior customer acquisition efficiency, higher conversion rates, seamless UX reducing friction.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Industry Inspiration</h3>
+                        <p>Booking.com's A/B testing culture, Expedia's digital marketing scale, Trend towards hyper-personalization.</p>
+                    </article>
+                     <article class="card kpi-card">
+                        <h3>Key KPIs (Examples)</h3>
+                        <div class="kpi">
+                            <span>Website Conversion Rate (Target: 2.5%)</span>
+                            <div class="progress-bar success"><div style="width: 60%;"></div></div>
+                        </div>
+                        <div class="kpi">
+                            <span>Customer Acquisition Cost (CAC) (Target: < $X)</span>
+                             <div class="progress-bar warning"><div style="width: 75%;"></div></div>
+                        </div>
+                         <div class="kpi">
+                            <span>Organic Traffic Growth (Target: +50% YoY)</span>
+                            <div class="progress-bar"><div style="width: 30%;"></div></div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Pillar 3: Customer Experience -->
+            <section id="pillar3" class="tab-content">
+                <h2>Pillar 3: Superior Customer Experience & Brand Loyalty</h2>
+                 <div class="content-grid">
+                    <article class="card">
+                        <h3>Objective</h3>
+                        <p>Create an exceptional end-to-end customer journey that fosters loyalty and advocacy.</p>
+                    </article>
+                     <article class="card">
+                        <h3>Key Strategies</h3>
+                        <ul>
+                            <li>Integrate all touchpoints into Unified Customer View (CRM).</li>
+                            <li>Ensure Seamless Omnichannel Journey (Digital Self-Serve <> Human).</li>
+                            <li>Leverage CRM/Automation for Proactive & Personalized Communication.</li>
+                            <li>Automate Feedback Loops (Surveys, Review Monitoring, Sentiment Analysis).</li>
+                            <li>Use AI-Chatbots for Tier 1 Support, seamless handover to humans.</li>
+                            <li>Develop Data-Driven Loyalty Program with tiered/exclusive benefits.</li>
+                        </ul>
+                    </article>
+                    <article class="card">
+                        <h3>Leverage Focus</h3>
+                        <p>Customer data for personalization, Technology for communication/feedback automation, Human expertise for high-touch service.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Analytics Focus</h3>
+                        <p>CSAT, NPS, Customer Lifetime Value (CLTV), Repeat Purchase Rate, Review Sentiment, Chatbot Effectiveness.</p>
+                    </article>
+                     <article class="card">
+                        <h3>Technology Focus</h3>
+                        <p>Advanced CRM, Marketing Automation, Survey Tools, Review Monitoring, Chatbot Platforms, Sentiment Analysis Tools.</p>
+                    </article>
+                     <article class="card">
+                        <h3>Competitive Advantage</h3>
+                        <p>Strong loyalty via tech-personalization + high-touch service blend, higher CLTV, positive WOM.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Industry Inspiration</h3>
+                        <p>Luxury travel agent service quality, Tech co relationship building, Trend towards experiential value.</p>
+                    </article>
+                     <article class="card kpi-card">
+                        <h3>Key KPIs (Examples)</h3>
+                        <div class="kpi">
+                            <span>Net Promoter Score (NPS) (Target: > 50)</span>
+                            <div class="progress-bar success"><div style="width: 80%;"></div></div>
+                        </div>
+                        <div class="kpi">
+                            <span>Customer Lifetime Value (CLTV) (Target: Increase 20% YoY)</span>
+                             <div class="progress-bar warning"><div style="width: 40%;"></div></div>
+                        </div>
+                         <div class="kpi">
+                            <span>Repeat Customer Rate (Target: 30%)</span>
+                            <div class="progress-bar"><div style="width: 55%;"></div></div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Pillar 4: Team & Culture -->
+            <section id="pillar4" class="tab-content">
+                <h2>Pillar 4: High-Performance Team & Culture</h2>
+                 <div class="content-grid">
+                     <article class="card">
+                        <h3>Objective</h3>
+                        <p>Build and nurture a skilled, motivated, and customer-centric team empowered by technology.</p>
+                    </article>
+                     <article class="card">
+                        <h3>Key Strategies</h3>
+                        <ul>
+                           <li>Targeted Recruitment for Niche Expertise & Service Skills (Use ATS).</li>
+                           <li>Tech-Enabled Training & Onboarding (LMS).</li>
+                           <li>Track Consultant Performance Analytics (Sales, CSAT, Efficiency).</li>
+                           <li>Implement Centralized Knowledge Management System (Wiki/DB).</li>
+                           <li>Empower Consultants with Advanced CRM Views & Booking Tools.</li>
+                           <li>Foster Data-Driven Culture of Excellence & Continuous Improvement.</li>
+                        </ul>
+                    </article>
+                    <article class="card">
+                        <h3>Leverage Focus</h3>
+                        <p>Technology for training/tracking/knowledge, Consultant expertise for complex tasks.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Analytics Focus</h3>
+                        <p>Consultant KPIs, Training Effectiveness, Time-to-Proficiency, Team Morale/Engagement.</p>
+                    </article>
+                     <article class="card">
+                        <h3>Technology Focus</h3>
+                        <p>ATS, LMS, Performance Mgmt Tools, Knowledge Base Software, Advanced Consultant CRM Dashboards.</p>
+                    </article>
+                     <article class="card">
+                        <h3>Competitive Advantage</h3>
+                        <p>Highly skilled, efficient team delivering superior service amplified by tech - hard to replicate.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Industry Inspiration</h3>
+                        <p>High-end travel agency advisor expertise, Tech co performance management & knowledge sharing.</p>
+                    </article>
+                    <article class="card kpi-card">
+                        <h3>Key KPIs (Examples)</h3>
+                        <div class="kpi">
+                            <span>Consultant CSAT Score (Target: > 4.5/5)</span>
+                            <div class="progress-bar success"><div style="width: 90%;"></div></div>
+                        </div>
+                        <div class="kpi">
+                            <span>Sales Conversion Rate (Consultant Assisted) (Target: 25%)</span>
+                             <div class="progress-bar warning"><div style="width: 65%;"></div></div>
+                        </div>
+                         <div class="kpi">
+                            <span>Employee Engagement Score (Target: > 80%)</span>
+                            <div class="progress-bar success"><div style="width: 70%;"></div></div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Pillar 5: Operational Efficiency -->
+            <section id="pillar5" class="tab-content">
+                <h2>Pillar 5: Operational Efficiency & Scalability</h2>
+                 <div class="content-grid">
+                    <article class="card">
+                        <h3>Objective</h3>
+                        <p>Ensure smooth, cost-effective operations and build a foundation for profitable growth.</p>
+                    </article>
+                     <article class="card">
+                        <h3>Key Strategies</h3>
+                        <ul>
+                            <li>Ensure Seamless Data Flow via Integrated Tech Stack (APIs).</li>
+                            <li>Implement Data-Driven Financial Management (Budgeting, Forecasting).</li>
+                            <li>Automate Repetitive Operational Tasks (Reporting, Confirmations).</li>
+                            <li>Choose Scalable Cloud-Based SaaS Infrastructure.</li>
+                            <li>Establish Centralized Data Warehouse/Lake for single source of truth.</li>
+                            <li>Develop Real-Time Performance Dashboards for all levels.</li>
+                        </ul>
+                    </article>
+                    <article class="card">
+                        <h3>Leverage Focus</h3>
+                        <p>Automation to reduce manual work, Cloud for scalability, Integrated data for holistic insights.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Analytics Focus</h3>
+                        <p>Operational Costs, Process Cycle Times, System Uptime, Financial KPIs (Profit, ROI, Variance), Data Quality.</p>
+                    </article>
+                     <article class="card">
+                        <h3>Technology Focus</h3>
+                        <p>Integrated CRM/Reservation System, Financial Software (APIs), BI Tools, Data Warehouse, Process Automation Tools (RPA).</p>
+                    </article>
+                     <article class="card">
+                        <h3>Competitive Advantage</h3>
+                        <p>Leaner operations, faster data-driven decisions, efficient scaling, lower cost base vs traditional.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Industry Inspiration</h3>
+                        <p>Amazon's operational efficiency (applied to travel), Mature e-commerce integrated systems approach.</p>
+                    </article>
+                    <article class="card kpi-card">
+                        <h3>Key KPIs (Examples)</h3>
+                        <div class="kpi">
+                            <span>Operational Cost as % of Revenue (Target: < 15%)</span>
+                            <div class="progress-bar warning"><div style="width: 50%;"></div></div>
+                        </div>
+                        <div class="kpi">
+                            <span>Booking Process Automation Rate (Target: 70%)</span>
+                             <div class="progress-bar success"><div style="width: 85%;"></div></div>
+                        </div>
+                         <div class="kpi">
+                            <span>System Uptime (Target: 99.9%)</span>
+                            <div class="progress-bar success"><div style="width: 99%;"></div></div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Phasing Plan -->
+            <section id="phasing" class="tab-content">
+                <h2>Phasing Plan & Measurement</h2>
+                <div class="phase-container">
+                    <article class="phase-card launch">
+                        <h3>Phase 1: Launch</h3>
+                        <span class="duration">Months 0-6</span>
+                        <p>Focus: Foundation & MVP</p>
+                        <ul>
+                            <li>Setup Core Tech Stack</li>
+                            <li>Define Niche/USP</li>
+                            <li>Recruit Initial Team</li>
+                            <li>Launch MVP Website/Booking</li>
+                            <li>Initiate Digital Marketing (SEO, SEM)</li>
+                            <li>Establish Basic Analytics</li>
+                        </ul>
+                        <p><strong>Key Metrics:</strong> Lead Velocity, Initial Bookings, Website Traffic, Tech Setup</p>
+                    </article>
+                     <article class="phase-card scale">
+                        <h3>Phase 2: Scale</h3>
+                         <span class="duration">Months 6-18</span>
+                         <p>Focus: Growth & Optimization</p>
+                        <ul>
+                            <li>Ramp Up Data-Driven Marketing</li>
+                            <li>Implement Personalization & CRO</li>
+                            <li>Build Out Partnerships</li>
+                            <li>Refine Team Training & Processes</li>
+                            <li>Enhance CRM Capabilities</li>
+                            <li>Develop Basic Loyalty Program</li>
+                        </ul>
+                         <p><strong>Key Metrics:</strong> CAC, Conversion Rate, Booking Volume, CSAT/NPS</p>
+                    </article>
+                     <article class="phase-card optimize">
+                        <h3>Phase 3: Optimize & Expand</h3>
+                         <span class="duration">Months 18+</span>
+                         <p>Focus: Profitability & Leadership</p>
+                        <ul>
+                            <li>Deepen AI Personalization</li>
+                            <li>Explore New Markets/Products</li>
+                            <li>Maximize Operational Automation</li>
+                            <li>Achieve Profitability Targets</li>
+                            <li>Build Strong Brand Advocacy</li>
+                            <li>Solidify Market Leadership</li>
+                        </ul>
+                         <p><strong>Key Metrics:</strong> CLTV, Market Share, Profitability, Repeat Rate</p>
+                    </article>
+                </div>
+            </section>
+
+        </main>
+
+        <footer>
+            <h4>Core Principles Driving Success</h4>
+            <p>Data is the Compass | Technology is the Engine | Leverage Amplifies Reach & Efficiency | Customer-Centricity is the Heart | Agility is Key</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // Simple Tab Switching Logic
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.getAttribute('data-tab');
+
+                // Remove active class from all buttons and content
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // Add active class to the clicked button and corresponding content
+                button.classList.add('active');
+                const activeContent = document.getElementById(targetTab);
+                if (activeContent) {
+                    activeContent.classList.add('active');
+
+                    // Optional: Re-trigger progress bar animation on tab switch
+                    const progressBars = activeContent.querySelectorAll('.progress-bar div');
+                    progressBars.forEach(bar => {
+                        // Reset animation by removing and adding class or style manipulation
+                        const currentWidth = bar.style.width;
+                        bar.style.width = '0'; // Reset
+                        setTimeout(() => { // Allow reset to render
+                           bar.style.animation = 'none'; // Temporarily disable animation
+                           bar.offsetHeight; /* trigger reflow */
+                           bar.style.animation = ''; // Re-enable animation
+                           bar.style.width = currentWidth; // Set back to original width to animate
+                        }, 10);
+                    });
+                }
+            });
+        });
+
+        // Initial trigger for progress bars on page load for the active tab
+        document.addEventListener('DOMContentLoaded', () => {
+             const initialActiveContent = document.querySelector('.tab-content.active');
+             if(initialActiveContent) {
+                  const progressBars = initialActiveContent.querySelectorAll('.progress-bar div');
+                    progressBars.forEach(bar => {
+                         // The animation defined in CSS will play automatically on load
+                         // No extra JS needed here unless more complex triggers are desired
+                    });
+             }
+        });
+
+    </script>
+
+</body>
+</html>
